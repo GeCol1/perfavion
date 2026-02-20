@@ -9,13 +9,14 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use OCP\Util;
 
+use OCA\PerfAvion\Application;
+
 class PageController extends Controller {
 
     public function __construct(
-        string $appName,
         IRequest $request
     ) {
-        parent::__construct($appName, $request);
+        parent::__construct(Application::APP_ID, $request);
     }
 
     /**
@@ -23,9 +24,9 @@ class PageController extends Controller {
      * @NoCSRFRequired
      */
     public function index(): TemplateResponse {
-        Util::addScript('perfavion', 'perfavion-main');
-        Util::addStyle('perfavion', 'perfavion-style');
+        Util::addScript(Application::APP_ID, 'perfavion-main');
+        Util::addStyle(Application::APP_ID, 'perfavion-style');
 
-        return new TemplateResponse('perfavion', 'main');
+        return new TemplateResponse(Application::APP_ID, 'main');
     }
 }

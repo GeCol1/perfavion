@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 
     <id>perfavion</id>
     <name>PerfAvion</name>
@@ -28,15 +28,17 @@ Fonctionnalités :
     <bugs>https://github.com/GeCol1/perfavion/issues</bugs>
 
     <dependencies>
-        <nextcloud min-version="28" max-version="32"/>
-        <php min-version="8.0"/>
+        <nextcloud min-version="28" max-version="32" />
+        <php min-version="8.0" />
     </dependencies>
 
-    <navigation>
-        <name>PerfAvion</name>
-        <route>perfavion.page.index</route>
-        <order>50</order>
-        <icon>icon.svg</icon>
-    </navigation>
+    <navigations>
+        <navigation>
+            <name>PerfAvion</name>
+            <route>perfavion.page.index</route>
+            <order>50</order>
+            <icon>app.svg</icon>
+        </navigation>
+    </navigations>
 
 </info>
