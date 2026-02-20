@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OCA\PerfAvion\Controller;
 
+use OCA\PerfAvion\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use OCP\Util;
 
-use OCA\PerfAvion\Application;
 
 class PageController extends Controller {
 
