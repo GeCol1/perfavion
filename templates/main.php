@@ -3,307 +3,355 @@
 /** @var array $_ */
 ?>
 
-<div id="perfavion-app" class="nc-app-content">
+<div id="app">
 
-    <!-- BARRE SÉLECTION AVION -->
-    <div class="nc-card">
-        <div class="nc-card__header">
-            <div class="nc-card__header-left">
-                <span class="app-name">Aéronef</span>
-                <select class="nc-select" id="aircraftSelect" onchange="PerfAvion.loadAircraft()" style="width:230px;"></select>
-                <button class="nc-btn nc-btn-secondary" onclick="PerfAvion.openModal()">⚙ Configurer</button>
-                <button class="nc-btn nc-btn-secondary" onclick="PerfAvion.newAircraft()">+ Nouvel avion</button>
-                <button class="nc-btn nc-btn-error" onclick="PerfAvion.deleteAircraft()">✕ Supprimer</button>
+    <!-- ═══════════════════════════════════════════════════
+         SIDEBAR NAVIGATION NEXTCLOUD
+         Structure officielle : #app-navigation
+    ════════════════════════════════════════════════════ -->
+    <div id="app-navigation">
+
+        <div class="app-navigation-new">
+            <button class="nc-btn nc-btn-primary" id="btn-new-aircraft"
+                    onclick="PerfAvion.newAircraft()">
+                + Nouvel avion
+            </button>
+        </div>
+
+        <ul id="aircraft-list">
+            <!-- Rempli dynamiquement par JS -->
+        </ul>
+
+        <div id="app-settings">
+            <div id="app-settings-header">
+                <button class="settings-button" data-apps-slide-toggle="#app-settings-content">
+                    Paramètres
+                </button>
             </div>
-            <div class="nc-card__header-right">
-                <button class="nc-btn nc-btn-tertiary" onclick="PerfAvion.resetFields()">↺ Réinitialiser</button>
-                <button class="nc-btn nc-btn-primary" onclick="PerfAvion.calculate()">▶ Calculer</button>
+            <div id="app-settings-content">
+                <p class="settings-hint">
+                    Les données avion sont sauvegardées dans votre navigateur (localStorage).
+                </p>
+                <button class="nc-btn nc-btn-tertiary" style="width:100%;margin-top:8px;"
+                        onclick="PerfAvion.exportData()">
+                    ⬇ Exporter les données
+                </button>
+                <label class="nc-btn nc-btn-tertiary" style="width:100%;margin-top:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    ⬆ Importer les données
+                    <input type="file" accept=".json" style="display:none"
+                           onchange="PerfAvion.importData(this)">
+                </label>
             </div>
         </div>
-    </div>
 
-    <!-- GRILLE PRINCIPALE -->
-    <div class="g2">
+    </div><!-- /#app-navigation -->
 
-        <!-- COLONNE SAISIE -->
-        <div class="g-auto">
+    <!-- ═══════════════════════════════════════════════════
+         CONTENU PRINCIPAL
+         Structure officielle : #app-content
+    ════════════════════════════════════════════════════ -->
+    <div id="app-content">
+        <div id="app-content-wrapper">
 
-            <!-- MASSES -->
-            <div class="nc-card">
-                <div class="nc-card__body">
-                    <div class="nc-subsection">Chargement — Masses</div>
-                    <div class="field-group">
-                        <div class="field-row">
-                            <span class="field-row__label">Masse à vide</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_empty" class="nc-input nc-input-sm" placeholder="—" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Pilote</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_pilot" class="nc-input nc-input-sm" value="80" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Passager avant</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_pax_f" class="nc-input nc-input-sm" value="0" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Passager arrière 1</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_pax_r1" class="nc-input nc-input-sm" value="0" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Passager arrière 2</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_pax_r2" class="nc-input nc-input-sm" value="0" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Bagages</span>
-                            <div class="field-row__input">
-                                <input type="number" id="m_baggage" class="nc-input nc-input-sm" value="0" step="1">
-                                <span class="field-row__unit">kg</span>
-                            </div>
-                        </div>
-                        <div class="nc-divider"></div>
-                        <div class="field-row">
-                            <span class="field-row__label">Carburant au départ</span>
-                            <div class="field-row__input">
-                                <input type="number" id="fuel_dep" class="nc-input nc-input-sm" value="120" step="1" oninput="PerfAvion.updateFuelKg()">
-                                <span class="field-row__unit">L</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Délestage en vol</span>
-                            <div class="field-row__input">
-                                <input type="number" id="fuel_burn" class="nc-input nc-input-sm" value="40" step="1">
-                                <span class="field-row__unit">L</span>
-                            </div>
-                        </div>
-                        <p class="text-sm mt-3" id="fuel_mass_info">≈ — kg de carburant au départ</p>
-                    </div>
+            <!-- TOOLBAR -->
+            <div id="perfavion-toolbar">
+                <span id="toolbar-aircraft-name">Aucun avion sélectionné</span>
+                <div id="toolbar-actions">
+                    <button class="nc-btn nc-btn-tertiary" onclick="PerfAvion.resetFields()">
+                        ↺ Réinitialiser
+                    </button>
+                    <button class="nc-btn nc-btn-primary" onclick="PerfAvion.calculate()">
+                        ▶ Calculer
+                    </button>
                 </div>
             </div>
 
-            <!-- MÉTÉO & TERRAIN -->
-            <div class="nc-card">
-                <div class="nc-card__body">
-                    <div class="nc-subsection">Météo &amp; Terrain</div>
-                    <div class="field-group">
-                        <div class="field-row">
-                            <span class="field-row__label">Altitude terrain</span>
-                            <div class="field-row__input">
-                                <input type="number" id="alt_terrain" class="nc-input nc-input-sm" value="0" step="10">
-                                <span class="field-row__unit">ft</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Température</span>
-                            <div class="field-row__input">
-                                <input type="number" id="temp" class="nc-input nc-input-sm" value="15" step="1">
-                                <span class="field-row__unit">°C</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Pression QNH</span>
-                            <div class="field-row__input">
-                                <input type="number" id="qnh" class="nc-input nc-input-sm" value="1013" step="1">
-                                <span class="field-row__unit">hPa</span>
-                            </div>
-                        </div>
-                        <div class="nc-divider"></div>
-                        <div class="field-row">
-                            <span class="field-row__label">Direction du vent</span>
-                            <div class="field-row__input">
-                                <input type="number" id="wind_dir" class="nc-input nc-input-sm" value="0" min="0" max="360" step="1">
-                                <span class="field-row__unit">°</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Vitesse du vent</span>
-                            <div class="field-row__input">
-                                <input type="number" id="wind_spd" class="nc-input nc-input-sm" value="0" step="1">
-                                <span class="field-row__unit">kt</span>
-                            </div>
-                        </div>
-                        <div class="field-row">
-                            <span class="field-row__label">QFU piste</span>
-                            <div class="field-row__input">
-                                <input type="number" id="qfu" class="nc-input nc-input-sm" value="0" min="0" max="360" step="1">
-                                <span class="field-row__unit">°</span>
-                            </div>
-                        </div>
-                        <div class="nc-divider"></div>
-                        <div class="field-row">
-                            <span class="field-row__label">Condition piste</span>
-                            <div class="field-row__input">
-                                <div class="nc-toggle">
-                                    <input type="radio" name="rw_wet" id="rw_dry" value="dry" checked>
-                                    <label for="rw_dry">Sèche</label>
-                                    <input type="radio" name="rw_wet" id="rw_wet" value="wet">
-                                    <label for="rw_wet">Mouillée</label>
+            <!-- GRILLE PRINCIPALE -->
+            <div id="perfavion-main">
+                <div class="g2">
+
+                    <!-- COLONNE SAISIE -->
+                    <div class="g-auto">
+
+                        <!-- MASSES -->
+                        <div class="nc-card">
+                            <div class="nc-card__body">
+                                <div class="nc-subsection">Chargement — Masses</div>
+                                <div class="field-group">
+                                    <div class="field-row">
+                                        <span class="field-row__label">Masse à vide</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_empty" class="nc-input nc-input-sm" placeholder="—" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Pilote</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_pilot" class="nc-input nc-input-sm" value="80" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Passager avant</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_pax_f" class="nc-input nc-input-sm" value="0" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Passager arrière 1</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_pax_r1" class="nc-input nc-input-sm" value="0" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Passager arrière 2</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_pax_r2" class="nc-input nc-input-sm" value="0" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Bagages</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="m_baggage" class="nc-input nc-input-sm" value="0" step="1">
+                                            <span class="field-row__unit">kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="nc-divider"></div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Carburant au départ</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="fuel_dep" class="nc-input nc-input-sm" value="120" step="1" oninput="PerfAvion.updateFuelKg()">
+                                            <span class="field-row__unit">L</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Délestage en vol</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="fuel_burn" class="nc-input nc-input-sm" value="40" step="1">
+                                            <span class="field-row__unit">L</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm mt-3" id="fuel_mass_info">≈ — kg de carburant au départ</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Surface piste</span>
-                            <div class="field-row__input">
-                                <div class="nc-toggle">
-                                    <input type="radio" name="rw_surf" id="rs_paved" value="paved" checked>
-                                    <label for="rs_paved">Revêtue</label>
-                                    <input type="radio" name="rw_surf" id="rs_grass" value="grass">
-                                    <label for="rs_grass">Herbe</label>
+
+                        <!-- MÉTÉO & TERRAIN -->
+                        <div class="nc-card">
+                            <div class="nc-card__body">
+                                <div class="nc-subsection">Météo &amp; Terrain</div>
+                                <div class="field-group">
+                                    <div class="field-row">
+                                        <span class="field-row__label">Altitude terrain</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="alt_terrain" class="nc-input nc-input-sm" value="0" step="10">
+                                            <span class="field-row__unit">ft</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Température</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="temp" class="nc-input nc-input-sm" value="15" step="1">
+                                            <span class="field-row__unit">°C</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Pression QNH</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="qnh" class="nc-input nc-input-sm" value="1013" step="1">
+                                            <span class="field-row__unit">hPa</span>
+                                        </div>
+                                    </div>
+                                    <div class="nc-divider"></div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Direction du vent</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="wind_dir" class="nc-input nc-input-sm" value="0" min="0" max="360" step="1">
+                                            <span class="field-row__unit">°</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Vitesse du vent</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="wind_spd" class="nc-input nc-input-sm" value="0" step="1">
+                                            <span class="field-row__unit">kt</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">QFU piste</span>
+                                        <div class="field-row__input">
+                                            <input type="number" id="qfu" class="nc-input nc-input-sm" value="0" min="0" max="360" step="1">
+                                            <span class="field-row__unit">°</span>
+                                        </div>
+                                    </div>
+                                    <div class="nc-divider"></div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Condition piste</span>
+                                        <div class="field-row__input">
+                                            <div class="nc-toggle">
+                                                <input type="radio" name="rw_wet" id="rw_dry" value="dry" checked>
+                                                <label for="rw_dry">Sèche</label>
+                                                <input type="radio" name="rw_wet" id="rw_wet" value="wet">
+                                                <label for="rw_wet">Mouillée</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Surface piste</span>
+                                        <div class="field-row__input">
+                                            <div class="nc-toggle">
+                                                <input type="radio" name="rw_surf" id="rs_paved" value="paved" checked>
+                                                <label for="rs_paved">Revêtue</label>
+                                                <input type="radio" name="rw_surf" id="rs_grass" value="grass">
+                                                <label for="rs_grass">Herbe</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-row">
+                                        <span class="field-row__label">Humidité</span>
+                                        <div class="field-row__input">
+                                            <div class="nc-toggle">
+                                                <input type="radio" name="humidity" id="hum_norm" value="normal" checked>
+                                                <label for="hum_norm">Normale</label>
+                                                <input type="radio" name="humidity" id="hum_high" value="high">
+                                                <label for="hum_high">Élevée</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="field-row">
-                            <span class="field-row__label">Humidité</span>
-                            <div class="field-row__input">
-                                <div class="nc-toggle">
-                                    <input type="radio" name="humidity" id="hum_norm" value="normal" checked>
-                                    <label for="hum_norm">Normale</label>
-                                    <input type="radio" name="humidity" id="hum_high" value="high">
-                                    <label for="hum_high">Élevée</label>
+
+                    </div><!-- /LEFT -->
+
+                    <!-- COLONNE RÉSULTATS -->
+                    <div class="g-auto">
+
+                        <div class="nc-card">
+                            <div class="nc-card__body">
+                                <div class="nc-subsection">Résultats — Masses</div>
+                                <div class="result-list">
+                                    <div class="result-item result-item--accent">
+                                        <span class="result-item__label">Masse au décollage</span>
+                                        <span class="result-item__value" id="r_mtow">—<span class="u">kg</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Masse sans carburant (MZF)</span>
+                                        <span class="result-item__value" id="r_mzf">—<span class="u">kg</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Masse à l'atterrissage</span>
+                                        <span class="result-item__value" id="r_mlanding">—<span class="u">kg</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Carburant à l'atterrissage</span>
+                                        <span class="result-item__value" id="r_fuel_arr">—<span class="u">L</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">MTOW limite réglementaire</span>
+                                        <span class="result-item__value" id="r_mtow_limit" style="color:var(--color-text-maxcontrast);">—<span class="u">kg</span></span>
+                                    </div>
+                                    <div class="result-item" id="mtow_status_row">
+                                        <span class="result-item__label">Statut masse</span>
+                                        <span id="mtow_badge">—</span>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="nc-card">
+                            <div class="nc-card__body">
+                                <div class="nc-subsection">Atmosphère</div>
+                                <div class="result-list">
+                                    <div class="result-item">
+                                        <span class="result-item__label">Composante de vent</span>
+                                        <span class="result-item__value" id="r_wind_comp">—</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Vent traversier</span>
+                                        <span class="result-item__value" id="r_xwind">—<span class="u">kt</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Altitude pression</span>
+                                        <span class="result-item__value" id="r_press_alt">—<span class="u">ft</span></span>
+                                    </div>
+                                    <div class="result-item result-item--accent">
+                                        <span class="result-item__label">Altitude densité</span>
+                                        <span class="result-item__value" id="r_dens_alt">—<span class="u">ft</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Écart ISA (ΔT)</span>
+                                        <span class="result-item__value" id="r_isa_dev">—<span class="u">°C</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="nc-card">
+                            <div class="nc-card__body">
+                                <div class="nc-subsection">Performances Piste</div>
+                                <div class="result-list">
+                                    <div class="result-item">
+                                        <span class="result-item__label">Roulement au décollage</span>
+                                        <span class="result-item__value" id="r_todr">—<span class="u">m</span></span>
+                                    </div>
+                                    <div class="result-item result-item--accent">
+                                        <span class="result-item__label">Distance décollage (50 ft)</span>
+                                        <span class="result-item__value" id="r_tod">—<span class="u">m</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-item__label">Roulement à l'atterrissage</span>
+                                        <span class="result-item__value" id="r_ldr">—<span class="u">m</span></span>
+                                    </div>
+                                    <div class="result-item result-item--accent">
+                                        <span class="result-item__label">Distance atterrissage (50 ft)</span>
+                                        <span class="result-item__value" id="r_ld">—<span class="u">m</span></span>
+                                    </div>
+                                </div>
+                                <p class="text-sm mt-3">⚠ Distances calculées par modélisation générique. Consultez toujours le manuel de vol certifié.</p>
+                            </div>
+                        </div>
+
+                    </div><!-- /RIGHT -->
+                </div><!-- /g2 -->
+
+                <!-- MASSE & CENTRAGE -->
+                <div class="nc-card" style="margin-top:16px;">
+                    <div class="nc-card__body">
+                        <div class="nc-subsection">Masse &amp; Centrage — Enveloppe de vol</div>
+                        <div class="canvas-wrap">
+                            <canvas id="cgCanvas" height="340"></canvas>
+                        </div>
+                        <div class="g2 mt-3" style="gap:10px;">
+                            <div class="result-item">
+                                <span class="result-item__label">CG au décollage</span>
+                                <span class="result-item__value" id="r_cg_to">—<span class="u">mm</span></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-item__label">CG à l'atterrissage</span>
+                                <span class="result-item__value" id="r_cg_arr">—<span class="u">mm</span></span>
+                            </div>
+                            <div class="result-item" style="grid-column:1/-1;">
+                                <span class="result-item__label">Statut centrage</span>
+                                <span id="cg_badge">—</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div><!-- /LEFT -->
+            </div><!-- /#perfavion-main -->
+        </div><!-- /#app-content-wrapper -->
+    </div><!-- /#app-content -->
 
-        <!-- COLONNE RÉSULTATS -->
-        <div class="g-auto">
+</div><!-- /#app -->
 
-            <!-- MASSES RÉSULTATS -->
-            <div class="nc-card">
-                <div class="nc-card__body">
-                    <div class="nc-subsection">Résultats — Masses</div>
-                    <div class="result-list">
-                        <div class="result-item result-item--accent">
-                            <span class="result-item__label">Masse au décollage (MTOW calculé)</span>
-                            <span class="result-item__value" id="r_mtow">—<span class="u">kg</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Masse sans carburant (MZF)</span>
-                            <span class="result-item__value" id="r_mzf">—<span class="u">kg</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Masse à l'atterrissage</span>
-                            <span class="result-item__value" id="r_mlanding">—<span class="u">kg</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Carburant à l'atterrissage</span>
-                            <span class="result-item__value" id="r_fuel_arr">—<span class="u">L</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">MTOW avion (limite réglementaire)</span>
-                            <span class="result-item__value" id="r_mtow_limit" style="color:var(--color-text-maxcontrast);">—<span class="u">kg</span></span>
-                        </div>
-                        <div class="result-item" id="mtow_status_row">
-                            <span class="result-item__label">Statut masse</span>
-                            <span id="mtow_badge">—</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ATMOSPHÈRE -->
-            <div class="nc-card">
-                <div class="nc-card__body">
-                    <div class="nc-subsection">Atmosphère</div>
-                    <div class="result-list">
-                        <div class="result-item">
-                            <span class="result-item__label">Composante de vent</span>
-                            <span class="result-item__value" id="r_wind_comp">—</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Vent traversier</span>
-                            <span class="result-item__value" id="r_xwind">—<span class="u">kt</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Altitude pression</span>
-                            <span class="result-item__value" id="r_press_alt">—<span class="u">ft</span></span>
-                        </div>
-                        <div class="result-item result-item--accent">
-                            <span class="result-item__label">Altitude densité</span>
-                            <span class="result-item__value" id="r_dens_alt">—<span class="u">ft</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Écart ISA (ΔT)</span>
-                            <span class="result-item__value" id="r_isa_dev">—<span class="u">°C</span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PERFORMANCES PISTE -->
-            <div class="nc-card">
-                <div class="nc-card__body">
-                    <div class="nc-subsection">Performances Piste</div>
-                    <div class="result-list">
-                        <div class="result-item">
-                            <span class="result-item__label">Roulement au décollage</span>
-                            <span class="result-item__value" id="r_todr">—<span class="u">m</span></span>
-                        </div>
-                        <div class="result-item result-item--accent">
-                            <span class="result-item__label">Distance décollage (franchissement 50 ft)</span>
-                            <span class="result-item__value" id="r_tod">—<span class="u">m</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-item__label">Roulement à l'atterrissage</span>
-                            <span class="result-item__value" id="r_ldr">—<span class="u">m</span></span>
-                        </div>
-                        <div class="result-item result-item--accent">
-                            <span class="result-item__label">Distance atterrissage (franchissement 50 ft)</span>
-                            <span class="result-item__value" id="r_ld">—<span class="u">m</span></span>
-                        </div>
-                    </div>
-                    <p class="text-sm mt-3">⚠ Distances calculées par modélisation générique. Consultez toujours le manuel de vol certifié.</p>
-                </div>
-            </div>
-
-        </div><!-- /RIGHT -->
-    </div><!-- /g2 -->
-
-    <!-- MASSE & CENTRAGE -->
-    <div class="nc-card">
-        <div class="nc-card__body">
-            <div class="nc-subsection">Masse &amp; Centrage — Enveloppe de vol</div>
-            <div class="canvas-wrap">
-                <canvas id="cgCanvas" height="340"></canvas>
-            </div>
-            <div class="g2 mt-3" style="gap:10px;">
-                <div class="result-item">
-                    <span class="result-item__label">CG au décollage</span>
-                    <span class="result-item__value" id="r_cg_to">—<span class="u">mm</span></span>
-                </div>
-                <div class="result-item">
-                    <span class="result-item__label">CG à l'atterrissage</span>
-                    <span class="result-item__value" id="r_cg_arr">—<span class="u">mm</span></span>
-                </div>
-                <div class="result-item" style="grid-column:1/-1;">
-                    <span class="result-item__label">Statut centrage</span>
-                    <span id="cg_badge">—</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div><!-- /#perfavion-app -->
-
-<!-- MODAL CONFIGURATION -->
+<!-- ═══════════════════════════════════════════════════
+     MODAL CONFIGURATION AVION
+════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="configModal">
     <div class="modal">
         <div class="modal__head">
@@ -336,7 +384,7 @@
         </div>
 
         <div class="tab-content" id="tab-arms">
-            <p class="text-muted" style="margin-bottom:10px;">Bras de levier (mm) depuis le datum de référence de l'avion.</p>
+            <p class="text-muted" style="margin-bottom:10px;">Bras de levier (mm) depuis le datum de référence.</p>
             <table class="nc-table">
                 <thead><tr><th>Poste / Compartiment</th><th>Lié à l'entrée</th><th>Bras (mm)</th><th></th></tr></thead>
                 <tbody id="armsTbody"></tbody>
