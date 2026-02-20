@@ -51,28 +51,65 @@
     let db  = loadDB();
     let idx = 0;
 
-    // ════════════════════════════════════════════════════════
-    // SÉLECTEUR AVION
-    // ════════════════════════════════════════════════════════
+    // ════════════════════════════════════════
+    // SIDEBAR — LISTE DES AVIONS
+    // ════════════════════════════════════════
 
-    function populateSelect() {
-        const sel = document.getElementById('aircraftSelect');
-        sel.innerHTML = '';
+    function renderSidebar() {
+        const ul = document.getElementById('aircraft-list');
+        ul.innerHTML = '';
+
         db.forEach(function(a, i) {
-            const o = document.createElement('option');
-            o.value = i;
-            o.textContent = a.name;
-            sel.appendChild(o);
+            const li = document.createElement('li');
+            li.className = i === idx ? 'active' : '';
+            li.dataset.idx = i;
+
+            li.innerHTML =
+                '<svg class="aircraft-icon" viewBox="0 0 24 24" fill="currentColor">' +
+                '<path d="M21 16L13 11V4.5C13 3.67 12.33 3 11.5 3S10 3.67 10 4.5V11' +
+                'L2 16V18L10 15.5V20L8 21.5V23L11.5 22L15 23V21.5L13 20V15.5L21 18V16Z"/>' +
+                '</svg>' +
+                '<span class="aircraft-name">' + escHtml(a.name) + '</span>' +
+                '<div class="aircraft-actions">' +
+                '  <button class="aircraft-action-btn" title="Configurer" ' +
+                '    onclick="event.stopPropagation();PerfAvion.openModal(' + i + ')">⚙</button>' +
+                '  <button class="aircraft-action-btn delete" title="Supprimer" ' +
+                '    onclick="event.stopPropagation();PerfAvion.deleteAircraft(' + i + ')">✕</button>' +
+                '</div>';
+
+            li.addEventListener('click', function() {
+                selectAircraft(i);
+            });
+
+            ul.appendChild(li);
         });
-        sel.value = idx;
     }
 
-    function loadAircraft() {
-        idx = parseInt(document.getElementById('aircraftSelect').value, 10);
-        document.getElementById('m_empty').value = db[idx].empty;
+    function selectAircraft(i) {
+        idx = i;
+        renderSidebar();
+        loadAircraftFields();
+    }
+
+    function loadAircraftFields() {
+        const a = db[idx];
+        document.getElementById('m_empty').value = a.empty;
+        document.getElementById('toolbar-aircraft-name').textContent = a.name;
         updateFuelKg();
         drawCG(null, null);
+        resetResults();
     }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // function loadAircraft() {
+    //     idx = parseInt(document.getElementById('aircraftSelect').value, 10);
+    //     document.getElementById('m_empty').value = db[idx].empty;
+    //     updateFuelKg();
+    //     drawCG(null, null);
+    // }
 
     function newAircraft() {
         const a = JSON.parse(JSON.stringify(DEFAULT_DB[0]));
